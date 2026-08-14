@@ -652,3 +652,42 @@ select:hover {
     font-size: 0.75rem;
     color: var(--text-secondary);
 }
+
+/* 3D Canvas Elements */
+#canvas-3d-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.22;
+}
+
+#canvas-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    pointer-events: none;
+}
+
+/* 3D Card Tilt Effects */
+.tilt-card {
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.tilt-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), 0 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Inner card elements depth */
+.tilt-card > * {
+    transform: translateZ(12px);
+}
+

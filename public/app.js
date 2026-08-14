@@ -231,6 +231,9 @@ function runOptimization() {
     agentStatus.textContent = 'RUNNING ANALYSIS...';
     consoleLogs.innerHTML = ''; // Reset console log lines
     
+    // Trigger dynamic 3D particle simulation flow
+    triggerOptimizationBurst();
+    
     logConsole('Agent', 'Initializing static code analyzer...', 'system');
     
     setTimeout(() => {
@@ -341,4 +344,256 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize line numbers count on load
     updateLineNumbers();
     updateCompilerCommand();
+    
+    // Initialize 3D Visual Systems
+    init3DBackground();
+    init3DTilt();
+    initParticlesCanvas();
 });
+
+// ----------------------------------------------------
+// 3D CONSTELLATION BACKGROUND ENGINE (No external libs)
+// ----------------------------------------------------
+function init3DBackground() {
+    const canvas = document.getElementById('canvas-3d-bg');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+    
+    // Create 3D Coordinates (X, Y, Z)
+    const points = [];
+    const numPoints = 48;
+    for (let i = 0; i < numPoints; i++) {
+        points.push({
+            x: (Math.random() - 0.5) * 800,
+            y: (Math.random() - 0.5) * 800,
+            z: (Math.random() - 0.5) * 800,
+            vx: (Math.random() - 0.5) * 0.15,
+            vy: (Math.random() - 0.5) * 0.15,
+            vz: (Math.random() - 0.5) * 0.15
+        });
+    }
+    
+    let angleX = 0.0006;
+    let angleY = 0.0008;
+    let mouseX = 0;
+    let mouseY = 0;
+    
+    window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX - width / 2) * 0.0002;
+        mouseY = (e.clientY - height / 2) * 0.0002;
+    });
+    
+    const d = 420; // Perspective depth
+    
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        
+        const currentAngleY = angleY + mouseX;
+        const currentAngleX = angleX + mouseY;
+        
+        const cosY = Math.cos(currentAngleY);
+        const sinY = Math.sin(currentAngleY);
+        const cosX = Math.cos(currentAngleX);
+        const sinX = Math.sin(currentAngleX);
+        
+        const projected = [];
+        
+        for (let i = 0; i < points.length; i++) {
+            const p = points[i];
+            
+            p.x += p.vx;
+            p.y += p.vy;
+            p.z += p.vz;
+            
+            // Boundary limits
+            if (Math.abs(p.x) > 400) p.vx *= -1;
+            if (Math.abs(p.y) > 400) p.vy *= -1;
+            if (Math.abs(p.z) > 400) p.vz *= -1;
+            
+            // 3D Matrix Rotations
+            let x1 = p.x * cosY - p.z * sinY;
+            let z1 = p.x * sinY + p.z * cosY;
+            let y2 = p.y * cosX - z1 * sinX;
+            let z2 = p.y * sinX + z1 * cosX;
+            
+            const z_project = z2 + 650;
+            const screenX = (x1 * d) / z_project + width / 2;
+            const screenY = (y2 * d) / z_project + height / 2;
+            
+            projected.push({ x: screenX, y: screenY, z: z_project, rawZ: z2 });
+        }
+        
+        // Render network wires
+        for (let i = 0; i < projected.length; i++) {
+            for (let j = i + 1; j < projected.length; j++) {
+                const p1 = points[i];
+                const p2 = points[j];
+                const dx = p1.x - p2.x;
+                const dy = p1.y - p2.y;
+                const dz = p1.z - p2.z;
+                const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                
+                if (dist < 200) {
+                    const screen1 = projected[i];
+                    const screen2 = projected[j];
+                    const alpha = (1 - dist / 200) * 0.16;
+                    
+                    ctx.strokeStyle = `rgba(27, 133, 243, ${alpha})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.beginPath();
+                    ctx.moveTo(screen1.x, screen1.y);
+                    ctx.lineTo(screen2.x, screen2.y);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Render glowing nodes
+        for (let i = 0; i < projected.length; i++) {
+            const screen = projected[i];
+            const r = Math.max(0.4, (1.8 * d) / screen.z);
+            const alpha = Math.min(1.0, Math.max(0.1, 1 - screen.z / 950)) * 0.4;
+            
+            ctx.fillStyle = `rgba(27, 133, 243, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(screen.x, screen.y, r * 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            if (screen.rawZ < -100) {
+                ctx.fillStyle = `rgba(165, 214, 255, ${alpha * 0.35})`;
+                ctx.beginPath();
+                ctx.arc(screen.x, screen.y, r * 3.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+// ----------------------------------------------------
+// TACTILE 3D CARD HOVER TILT INTERACTIVE ENGINE
+// ----------------------------------------------------
+function init3DTilt() {
+    const cards = document.querySelectorAll('.tilt-card');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((centerY - y) / centerY) * 8; // Max 8 degree tilt
+            const rotateY = ((x - centerX) / centerX) * 8;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+        });
+    });
+}
+
+// ----------------------------------------------------
+// 3D COMPILER PARTICLE EMITTER FLOW VISUALS
+// ----------------------------------------------------
+let flowParticles = [];
+let particlesAnimationId = null;
+
+function initParticlesCanvas() {
+    const canvas = document.getElementById('canvas-particles');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+    
+    function drawParticles() {
+        ctx.clearRect(0, 0, width, height);
+        
+        for (let i = flowParticles.length - 1; i >= 0; i--) {
+            const p = flowParticles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += p.gravity;
+            p.life -= p.decay;
+            
+            if (p.life <= 0) {
+                flowParticles.splice(i, 1);
+                continue;
+            }
+            
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = p.color;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Reset shadows for standard renders
+            ctx.shadowBlur = 0;
+        }
+        
+        particlesAnimationId = requestAnimationFrame(drawParticles);
+    }
+    
+    if (!particlesAnimationId) {
+        drawParticles();
+    }
+}
+
+function triggerOptimizationBurst() {
+    const btn = document.getElementById('optimize-btn');
+    const logs = document.getElementById('console-logs');
+    if (!btn || !logs) return;
+    
+    const startRect = btn.getBoundingClientRect();
+    const targetRect = logs.getBoundingClientRect();
+    
+    const startX = startRect.left + startRect.width / 2;
+    const startY = startRect.top + startRect.height / 2;
+    const targetX = targetRect.left + targetRect.width / 2;
+    const targetY = targetRect.top + targetRect.height / 2;
+    
+    const particleColors = ['#1b85f3', '#da3633', '#a5d6ff', '#3fb950'];
+    
+    for (let i = 0; i < 65; i++) {
+        const dx = targetX - startX;
+        const dy = targetY - startY;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        // Launch arc physics vector paths
+        const speedMultiplier = 6 + Math.random() * 9;
+        const vx = (dx / dist) * speedMultiplier + (Math.random() - 0.5) * 4;
+        const vy = (dy / dist) * speedMultiplier - 4 - Math.random() * 5;
+        
+        flowParticles.push({
+            x: startX,
+            y: startY,
+            vx: vx,
+            vy: vy,
+            size: 2.0 + Math.random() * 2.5,
+            color: particleColors[Math.floor(Math.random() * particleColors.length)],
+            life: 1.0,
+            decay: 0.012 + Math.random() * 0.015,
+            gravity: 0.12 + Math.random() * 0.08
+        });
+    }
+}

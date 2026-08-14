@@ -31,7 +31,7 @@
         <!-- Main Content -->
         <main class="app-main">
             <!-- Left Panel: Code Input & Examples -->
-            <section class="panel input-panel">
+            <section class="panel input-panel tilt-card">
                 <div class="panel-header">
                     <h2>Source Implementation</h2>
                     <div class="file-selector">
@@ -66,7 +66,7 @@
             </section>
 
             <!-- Right Panel: Outputs and Analysis -->
-            <section class="panel output-panel">
+            <section class="panel output-panel tilt-card">
                 <div class="panel-header">
                     <div class="tabs">
                         <button class="tab-btn active" data-tab="tab-optimizer">Agent Logs</button>
@@ -118,7 +118,7 @@
                     <!-- Tab: Performance Profile -->
                     <div id="tab-performance" class="tab-content">
                         <div class="performance-grid">
-                            <div class="metric-summary-card">
+                            <div class="metric-summary-card tilt-card">
                                 <h3>Efficiency Improvement</h3>
                                 <div class="metric-flex">
                                     <div class="speedup-display">
@@ -147,27 +147,27 @@
                             </div>
                             
                             <div class="charts-row">
-                                <div class="chart-container">
+                                <div class="chart-container tilt-card">
                                     <h4>Execution Latency (ms)</h4>
                                     <canvas id="latencyChart"></canvas>
                                 </div>
                                 
-                                <div class="chart-container">
+                                <div class="chart-container tilt-card">
                                     <h4>L1/L2 Cache Misses (%)</h4>
                                     <canvas id="cacheChart"></canvas>
                                 </div>
                                 
-                                <div class="chart-container">
+                                <div class="chart-container tilt-card">
                                     <h4>Power Draw (mW)</h4>
                                     <canvas id="powerChart"></canvas>
                                 </div>
 
-                                <div class="chart-container">
+                                <div class="chart-container tilt-card">
                                     <h4>Instructions Executed (M)</h4>
                                     <canvas id="instructionsChart"></canvas>
                                 </div>
 
-                                <div class="chart-container">
+                                <div class="chart-container tilt-card">
                                     <h4>Memory Throughput (GB/s)</h4>
                                     <canvas id="bandwidthChart"></canvas>
                                 </div>
@@ -183,6 +183,9 @@
             <p>Arm Create 2026: AI Optimization Challenge Submission. Powered by Arm Dev Ecosystem.</p>
         </footer>
     </div>
+    <!-- 3D Constellation and Particle Canvases -->
+    <canvas id="canvas-3d-bg"></canvas>
+    <canvas id="canvas-particles"></canvas>
     <script src="app.js"></script>
 </body>
 </html>
