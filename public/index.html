@@ -16,14 +16,14 @@
         <!-- Header -->
         <header class="app-header">
             <div class="header-logo">
-                <div class="logo-icon">Arm</div>
+                <div class="logo-icon">ARM</div>
                 <div class="logo-text">
                     <h1>Agentic-Optimizer</h1>
                     <p>Automated Profiler & Refactoring for Armv8/v9 CPUs</p>
                 </div>
             </div>
             <div class="header-status">
-                <span class="status-dot"></span>
+                <span class="status-pulse"></span>
                 <span class="status-text">Sim-Engine Active: ARMv9-A Neoverse</span>
             </div>
         </header>
@@ -47,10 +47,14 @@
                 
                 <div class="code-wrapper">
                     <div class="editor-filename">
-                        <span class="file-icon">📄</span>
-                        <input type="text" id="filename-input" value="kernel.cpp">
+                        <span class="file-icon">📁</span>
+                        <input type="text" id="filename-input" value="kernel.cpp" readonly>
                     </div>
-                    <textarea id="code-input" spellcheck="false" placeholder="Paste your C++ or Python AI/math kernel code here..."></textarea>
+                    <!-- IDE-like container with synced line numbers -->
+                    <div class="editor-container">
+                        <div class="line-numbers" id="line-numbers"></div>
+                        <textarea id="code-input" spellcheck="false" placeholder="Paste your C++ or Python AI/math kernel code here..."></textarea>
+                    </div>
                 </div>
                 
                 <div class="panel-actions">
@@ -101,35 +105,39 @@
                         <div class="performance-grid">
                             <div class="metric-summary-card">
                                 <h3>Efficiency Improvement</h3>
-                                <div class="speedup-display">
-                                    <span id="speedup-val">--</span>
-                                    <span class="speedup-label">Inference Speedup</span>
-                                </div>
-                                <div class="sub-metrics">
-                                    <div class="sub-metric-item">
-                                        <span class="sub-label">Cycles Saved</span>
-                                        <span id="cycles-saved-val" class="sub-val">--</span>
+                                <div class="metric-flex">
+                                    <div class="speedup-display">
+                                        <span id="speedup-val">--</span>
+                                        <span class="speedup-label">Inference Speedup</span>
                                     </div>
-                                    <div class="sub-metric-item">
-                                        <span class="sub-label">Energy Saved</span>
-                                        <span id="energy-saved-val" class="sub-val">--</span>
+                                    <div class="sub-metrics">
+                                        <div class="sub-metric-item">
+                                            <span class="sub-label">Cycles Saved</span>
+                                            <span id="cycles-saved-val" class="sub-val">--</span>
+                                        </div>
+                                        <div class="sub-metric-item">
+                                            <span class="sub-label">Energy Saved</span>
+                                            <span id="energy-saved-val" class="sub-val">--</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div class="chart-container">
-                                <h4>Execution Latency (ms) - Lower is Better</h4>
-                                <canvas id="latencyChart"></canvas>
-                            </div>
-                            
-                            <div class="chart-container">
-                                <h4>L1/L2 Cache Misses (%) - Lower is Better</h4>
-                                <canvas id="cacheChart"></canvas>
-                            </div>
-                            
-                            <div class="chart-container">
-                                <h4>Power Draw (mW) - Lower is Better</h4>
-                                <canvas id="powerChart"></canvas>
+                            <div class="charts-row">
+                                <div class="chart-container">
+                                    <h4>Execution Latency (ms)</h4>
+                                    <canvas id="latencyChart"></canvas>
+                                </div>
+                                
+                                <div class="chart-container">
+                                    <h4>L1/L2 Cache Misses (%)</h4>
+                                    <canvas id="cacheChart"></canvas>
+                                </div>
+                                
+                                <div class="chart-container">
+                                    <h4>Power Draw (mW)</h4>
+                                    <canvas id="powerChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>

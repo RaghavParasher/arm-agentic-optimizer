@@ -28,6 +28,7 @@ const exampleSelect = document.getElementById('example-select');
 const loadExampleBtn = document.getElementById('load-example-btn');
 const filenameInput = document.getElementById('filename-input');
 const codeInput = document.getElementById('code-input');
+const lineNumbers = document.getElementById('line-numbers');
 const optimizeBtn = document.getElementById('optimize-btn');
 const consoleLogs = document.getElementById('console-logs');
 const agentStatus = document.getElementById('agent-status');
@@ -37,12 +38,26 @@ const copyCodeBtn = document.getElementById('copy-code-btn');
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 
+// Dynamically generate line numbers gutter
+function updateLineNumbers() {
+    const lines = codeInput.value.split('\n');
+    const lineCount = Math.max(lines.length, 1);
+    let html = '';
+    for (let i = 1; i <= lineCount; i++) {
+        html += `<div>${i}</div>`;
+    }
+    lineNumbers.innerHTML = html;
+    // Align scroll
+    lineNumbers.scrollTop = codeInput.scrollTop;
+}
+
 // Load Selected Example Template
 function loadTemplate() {
     const selected = exampleSelect.value;
     if (templates[selected]) {
         filenameInput.value = templates[selected].filename;
         codeInput.value = templates[selected].code;
+        updateLineNumbers();
         logConsole(`System`, `Loaded template: ${templates[selected].filename}`);
     }
 }
@@ -110,12 +125,12 @@ function renderBarChart(ctxId, label, beforeVal, afterVal, beforeLabel, afterLab
             datasets: [{
                 data: [beforeVal, afterVal],
                 backgroundColor: [
-                    'rgba(218, 54, 51, 0.7)',  // Red for before
-                    'rgba(25, 127, 229, 0.7)'   // Blue for after
+                    'rgba(218, 54, 51, 0.8)',  // Red for before
+                    'rgba(27, 133, 243, 0.8)'   // Blue for after
                 ],
                 borderColor: [
                     '#da3633',
-                    '#197fe5'
+                    '#1b85f3'
                 ],
                 borderWidth: 1.5,
                 borderRadius: 4
@@ -129,10 +144,10 @@ function renderBarChart(ctxId, label, beforeVal, afterVal, beforeLabel, afterLab
             },
             scales: {
                 y: {
-                    grid: { color: '#222736' },
+                    grid: { color: '#1e2230' },
                     ticks: {
                         color: '#8b949e',
-                        font: { family: 'Inter', size: 10 },
+                        font: { family: 'Inter', size: 9 },
                         callback: function(value) { return value + valueSuffix; }
                     }
                 },
@@ -140,7 +155,7 @@ function renderBarChart(ctxId, label, beforeVal, afterVal, beforeLabel, afterLab
                     grid: { display: false },
                     ticks: {
                         color: '#8b949e',
-                        font: { family: 'Inter', size: 11 }
+                        font: { family: 'Inter', size: 10, weight: '500' }
                     }
                 }
             }
@@ -257,6 +272,12 @@ document.addEventListener('DOMContentLoaded', () => {
     optimizeBtn.addEventListener('click', runOptimization);
     copyCodeBtn.addEventListener('click', copyCode);
     
+    // Editor scroll synchronization and inputs
+    codeInput.addEventListener('scroll', () => {
+        lineNumbers.scrollTop = codeInput.scrollTop;
+    });
+    codeInput.addEventListener('input', updateLineNumbers);
+    
     // Tab click events
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -264,4 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
             switchTab(tabId);
         });
     });
+    
+    // Initialize line numbers count on load
+    updateLineNumbers();
 });
