@@ -15,8 +15,8 @@ This project was built for **Track 2: Cloud AI** in the **Arm Create: AI Optimiz
    * **Arm NEON SIMD:** Employs registers to parallelize floating-point vector additions, multiplications, and activations.
    * **Arm KleidiAI:** Incorporates microkernels like `kai_matmul_clamp_f32_f32_f32_neon` to maximize L1/L2 cache efficiency and run low-level assembly gemm kernels.
    * **Vectorized Library Mappings:** Converts naive Python iterations into compiled NumPy backend operations executing against OpenBLAS / Arm Performance Libraries.
-3. **Interactive Benchmarking Simulator:** Models compiler flag logic (`-O3 -march=armv8-a+simd`) to project execution latency, cycle count reductions, cache-miss drops, and active power footprint.
-4. **Visual Optimization Dashboard:** A dark-themed, premium front-end displaying side-by-side code diffs, real-time agent execution logs, and detailed comparison charts.
+3. **Interactive Benchmarking Simulator:** Models compiler flag logic (`-O3 -march=armv8-a+simd`) to project execution latency, cycle count reductions, cache-miss drops, memory bandwidth improvements (GB/s), instructions executed, active power footprint (mW), estimated carbon offset (g CO2), and hosting cost reductions ($).
+4. **Visual Optimization Dashboard:** A dark-themed, premium front-end displaying side-by-side code diffs, real-time agent execution logs, dynamic compiler preset outputs, and detailed comparison charts.
 
 ---
 
@@ -33,6 +33,12 @@ The optimizer links dense linear layers to specialized microkernels designed spe
 
 ### 3. Element-wise SIMD Loop Unrolling
 Standard operations ($C[i] = A[i] + B[i]$) are parallelized by loading four 32-bit floats into 128-bit SIMD registers, performing `vaddq_f32`, and writing them back via `vst1q_f32` in a single step.
+
+### 4. Vectorized Softmax (Taylor Approximation)
+Exponential functions are compute-bound due to scalar Taylor expansions. The engine refactors loops to:
+* Find the maximum vector element using parallel reduction with `vmaxq_f32`.
+* Subtract it from the inputs via `vsubq_f32` to avoid exponent overflow.
+* Approximate exponential coefficients in parallel using a polynomial Taylor series mapped to `vfmaq_f32` (Fused Multiply-Accumulate) instructions.
 
 ---
 
