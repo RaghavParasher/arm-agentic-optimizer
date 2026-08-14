@@ -39,6 +39,7 @@
                             <option value="matmul">Matrix Multiplication (C++)</option>
                             <option value="vecadd">Vector Addition (C++)</option>
                             <option value="relu">ReLU Activation (C++)</option>
+                            <option value="softmax">Softmax Activation (C++)</option>
                             <option value="python_loop">Naive Loops (Python)</option>
                         </select>
                         <button id="load-example-btn" class="btn-secondary">Load Template</button>
@@ -133,6 +134,14 @@
                                             <span class="sub-label">Energy Saved</span>
                                             <span id="energy-saved-val" class="sub-val">--</span>
                                         </div>
+                                        <div class="sub-metric-item">
+                                            <span class="sub-label">Carbon Offset</span>
+                                            <span id="carbon-saved-val" class="sub-val">--</span>
+                                        </div>
+                                        <div class="sub-metric-item">
+                                            <span class="sub-label">Cost Reduced</span>
+                                            <span id="cost-saved-val" class="sub-val">--</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -151,6 +160,16 @@
                                 <div class="chart-container">
                                     <h4>Power Draw (mW)</h4>
                                     <canvas id="powerChart"></canvas>
+                                </div>
+
+                                <div class="chart-container">
+                                    <h4>Instructions Executed (M)</h4>
+                                    <canvas id="instructionsChart"></canvas>
+                                </div>
+
+                                <div class="chart-container">
+                                    <h4>Memory Throughput (GB/s)</h4>
+                                    <canvas id="bandwidthChart"></canvas>
                                 </div>
                             </div>
                         </div>

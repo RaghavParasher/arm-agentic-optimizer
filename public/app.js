@@ -12,6 +12,10 @@ const templates = {
         filename: 'relu.cpp',
         code: `#include <algorithm>\n\n// Naive ReLU Activation Function\nvoid relu(float* data, int size) {\n    for (int i = 0; i < size; ++i) {\n        data[i] = std::max(0.0f, data[i]);\n    }\n}`
     },
+    softmax: {
+        filename: 'softmax.cpp',
+        code: `// Naive Softmax implementation\n#include <cmath>\n\nvoid softmax(const float* input, float* output, int size) {\n    float sum = 0.0f;\n    float max_val = input[0];\n    \n    // Find max value to prevent overflow\n    for (int i = 1; i < size; ++i) {\n        if (input[i] > max_val) {\n            max_val = input[i];\n        }\n    }\n    \n    // Calculate exponentials and sum\n    for (int i = 0; i < size; ++i) {\n        output[i] = std::exp(input[i] - max_val);\n        sum += output[i];\n    }\n    \n    // Normalize outputs\n    for (int i = 0; i < size; ++i) {\n        output[i] /= sum;\n    }\n}`
+    },
     python_loop: {
         filename: 'process.py',
         code: `# Naive Python loop performing array arithmetic\ndef process_lists(a, b):\n    result = []\n    for i in range(len(a)):\n        result.append(a[i] + b[i])\n    return result`
@@ -22,6 +26,8 @@ const templates = {
 let latencyChartInstance = null;
 let cacheChartInstance = null;
 let powerChartInstance = null;
+let instructionsChartInstance = null;
+let bandwidthChartInstance = null;
 
 // DOM Elements
 const exampleSelect = document.getElementById('example-select');
@@ -146,6 +152,8 @@ function clearCharts() {
     if (latencyChartInstance) latencyChartInstance.destroy();
     if (cacheChartInstance) cacheChartInstance.destroy();
     if (powerChartInstance) powerChartInstance.destroy();
+    if (instructionsChartInstance) instructionsChartInstance.destroy();
+    if (bandwidthChartInstance) bandwidthChartInstance.destroy();
 }
 
 // Build standard double bar charts (Before vs After)
@@ -201,6 +209,10 @@ function renderBarChart(ctxId, label, beforeVal, afterVal, beforeLabel, afterLab
         cacheChartInstance = new Chart(ctx, config);
     } else if (ctxId === 'powerChart') {
         powerChartInstance = new Chart(ctx, config);
+    } else if (ctxId === 'instructionsChart') {
+        instructionsChartInstance = new Chart(ctx, config);
+    } else if (ctxId === 'bandwidthChart') {
+        bandwidthChartInstance = new Chart(ctx, config);
     }
 }
 
@@ -279,12 +291,16 @@ function runOptimization() {
                 document.getElementById('speedup-val').textContent = `${perf.improvements.latency_speedup_x}x`;
                 document.getElementById('cycles-saved-val').textContent = `${perf.improvements.cpu_cycles_saved_pct}%`;
                 document.getElementById('energy-saved-val').textContent = `${perf.improvements.energy_savings_pct}%`;
+                document.getElementById('carbon-saved-val').textContent = `${perf.improvements.carbon_savings_pct}%`;
+                document.getElementById('cost-saved-val').textContent = `${perf.improvements.cost_savings_pct}%`;
                 
                 // Render Charts
                 clearCharts();
                 renderBarChart('latencyChart', 'Latency', perf.metrics_before.latency_ms, perf.metrics_after.latency_ms, perf.label_before, perf.label_after, ' ms');
                 renderBarChart('cacheChart', 'Cache Misses', perf.metrics_before.cache_misses_pct, perf.metrics_after.cache_misses_pct, perf.label_before, perf.label_after, '%');
                 renderBarChart('powerChart', 'Power Draw', perf.metrics_before.power_draw_mw, perf.metrics_after.power_draw_mw, perf.label_before, perf.label_after, ' mW');
+                renderBarChart('instructionsChart', 'Instructions', perf.metrics_before.instructions_m, perf.metrics_after.instructions_m, perf.label_before, perf.label_after, ' M');
+                renderBarChart('bandwidthChart', 'Bandwidth', perf.metrics_before.bandwidth_gbs, perf.metrics_after.bandwidth_gbs, perf.label_before, perf.label_after, ' GB/s');
                 
                 logConsole('System', 'Performance profile diagrams ready in "Performance Profile" tab.', 'system');
             }, 1800);

@@ -64,6 +64,21 @@ function analyzeCpp(code) {
             impact: "Medium (Up to 3x speedup)"
         });
     }
+
+    // 4. Softmax activation (exp function inside loops)
+    const softmaxPattern = /(?:std::)?exp\s*\(\s*([\w\[\]\(\)\+\-\*\/]+)\s*\)/g;
+    while ((match = softmaxPattern.exec(code)) !== null) {
+        const startChar = match.index;
+        const lineNum = code.substring(0, startChar).split('\n').length;
+        candidates.push({
+            type: "Activation Function (Softmax/Exp)",
+            line: lineNum,
+            snippet: match[0],
+            suggestion: "NEON Vectorized Softmax with Taylor approximation (`vexpq_f32`)",
+            description: "Found an exponential activation function. Exponential functions are extremely slow on CPUs because they involve floating-point expansions. Using NEON SIMD with polynomial Taylor series approximations enables compiling it into parallel additions and multiplications.",
+            impact: "High (Up to 6x speedup)"
+        });
+    }
         
     return candidates;
 }

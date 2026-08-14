@@ -130,6 +130,89 @@ def optimized_process(a, b):
     return a_arr + b_arr
 `;
 
+const NEON_SOFTMAX_CPP = `// ==========================================
+// ARMV8-A NEON VECTORIZED SOFTMAX
+// Optimized by Arm-Agentic-Optimizer
+// ==========================================
+#include <arm_neon.h>
+#include <cmath>
+
+// Vector math helper for exp (approximation using Taylor series)
+inline float32x4_t vexpq_f32_approx(float32x4_t x) {
+    // Polynomial approximation of exp(x) for NEON SIMD
+    float32x4_t one = vdupq_n_f32(1.0f);
+    float32x4_t half = vdupq_n_f32(0.5f);
+    float32x4_t inv_6 = vdupq_n_f32(0.1666666f);
+    
+    float32x4_t t = x;
+    float32x4_t res = vaddq_f32(one, t); // 1 + x
+    
+    float32x4_t t2 = vmulq_f32(t, t);
+    res = vfmaq_f32(res, t2, half); // + x^2 / 2
+    
+    float32x4_t t3 = vmulq_f32(t2, t);
+    res = vfmaq_f32(res, t3, inv_6); // + x^3 / 6
+    
+    return res;
+}
+
+void softmax_neon(const float* input, float* output, int size) {
+    int i = 0;
+    float max_val = input[0];
+    
+    // 1. Find max using vector registers
+    float32x4_t max_vec = vdupq_n_f32(input[0]);
+    for (; i <= size - 4; i += 4) {
+        float32x4_t val = vld1q_f32(&input[i]);
+        max_vec = vmaxq_f32(max_vec, val);
+    }
+    // Reduction max
+    float temp_max[4];
+    vst1q_f32(temp_max, max_vec);
+    for (int j = 0; j < 4; ++j) {
+        if (temp_max[j] > max_val) max_val = temp_max[j];
+    }
+    // Handle tail
+    for (; i < size; ++i) {
+        if (input[i] > max_val) max_val = input[i];
+    }
+    
+    // 2. Exponential and accumulation sum
+    float32x4_t max_val_vec = vdupq_n_f32(max_val);
+    float32x4_t sum_vec = vdupq_n_f32(0.0f);
+    
+    i = 0;
+    for (; i <= size - 4; i += 4) {
+        float32x4_t val = vld1q_f32(&input[i]);
+        float32x4_t diff = vsubq_f32(val, max_val_vec);
+        float32x4_t exp_val = vexpq_f32_approx(diff);
+        vst1q_f32(&output[i], exp_val);
+        sum_vec = vaddq_f32(sum_vec, exp_val);
+    }
+    
+    float sum = 0.0f;
+    float temp_sum[4];
+    vst1q_f32(temp_sum, sum_vec);
+    for (int j = 0; j < 4; ++j) sum += temp_sum[j];
+    
+    for (; i < size; ++i) {
+        output[i] = std::exp(input[i] - max_val);
+        sum += output[i];
+    }
+    
+    // 3. Normalize values
+    float32x4_t inv_sum_vec = vdupq_n_f32(1.0f / sum);
+    i = 0;
+    for (; i <= size - 4; i += 4) {
+        float32x4_t val = vld1q_f32(&output[i]);
+        float32x4_t res = vmulq_f32(val, inv_sum_vec);
+        vst1q_f32(&output[i], res);
+    }
+    for (; i < size; ++i) {
+        output[i] /= sum;
+    }
+}`;
+
 function generateRewrite(code, filename) {
     const ext = filename.split('.').pop().toLowerCase();
     let optimizedCode = code;
@@ -150,6 +233,12 @@ function generateRewrite(code, filename) {
             logs.push("Action: Vectorized the arithmetic loop using Arm NEON intrinsics.");
             logs.push("NEON Plan: Load 4 float elements via `vld1q_f32`, execute vector add `vaddq_f32`, and write back using `vst1q_f32` (SIMD parallelism). Handled array boundary tail elements with a scalar loop.");
             
+        } else if (code.includes('exp') || code.includes('std::exp')) {
+            optimizedCode = NEON_SOFTMAX_CPP;
+            logs.push("Target: Naive exponent/softmax normalization loop detected.");
+            logs.push("Action: Rewrote using vectorized NEON parallel exponent math functions.");
+            logs.push("NEON Plan: Processed 4 elements concurrently using vector registers. Calculated vector max value using `vmaxq_f32` reductions, performed vector subtracting via `vsubq_f32`, and approximated `exp(x)` using a 3rd degree Taylor polynomial mapped directly to parallel SIMD multiply-accumulate `vfmaq_f32` instructions. Normalization executed via scalar reciprocal division vector multiplication `vmulq_f32` mapping.");
+
         } else if (code.includes('max') || code.includes('std::max')) {
             optimizedCode = NEON_RELU_CPP;
             logs.push("Target: ReLU / max activation pattern detected.");
