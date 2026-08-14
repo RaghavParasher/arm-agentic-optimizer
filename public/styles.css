@@ -1,0 +1,486 @@
+/* CSS Variables for Clean Design Tokens */
+:root {
+    --bg-dark: #0c0e12;
+    --card-bg: #141720;
+    --border-color: #222736;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent-blue: #197fe5;
+    --accent-blue-hover: #2188ff;
+    --accent-green: #2ea44f;
+    --accent-red: #da3633;
+    --console-bg: #07090e;
+    --code-bg: #0d1117;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* App Layout Grid */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header Styles */
+.app-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-icon {
+    background-color: var(--accent-blue);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.logo-text h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.2px;
+}
+
+.logo-text p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.header-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(25, 127, 229, 0.1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid rgba(25, 127, 229, 0.2);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--accent-blue);
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px var(--accent-blue);
+}
+
+.status-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* Main Area Layout */
+.app-main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px; /* Divider effect */
+    background-color: var(--border-color);
+    overflow: hidden;
+}
+
+.panel {
+    background-color: var(--bg-dark);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.panel-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.1px;
+}
+
+/* Editor Wrapper */
+.code-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--code-bg);
+    overflow: hidden;
+}
+
+.editor-filename {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.file-icon {
+    font-size: 0.9rem;
+}
+
+.editor-filename input {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    width: 200px;
+    outline: none;
+}
+
+textarea#code-input {
+    flex: 1;
+    background-color: var(--code-bg);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: 1.25rem;
+    border: none;
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+}
+
+/* Dropdown and Action Buttons */
+.file-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+select {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    outline: none;
+    font-family: var(--font-sans);
+}
+
+.btn-primary {
+    background-color: var(--accent-blue);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-blue-hover);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--text-secondary);
+}
+
+.panel-actions {
+    padding: 1rem 1.5rem;
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Tabs system */
+.tabs {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.tab-btn.active {
+    color: var(--text-primary);
+    background-color: rgba(25, 127, 229, 0.15);
+    border: 1px solid rgba(25, 127, 229, 0.25);
+}
+
+.panel-body {
+    flex: 1;
+    overflow-y: auto;
+    background-color: var(--bg-dark);
+}
+
+.tab-content {
+    display: none;
+    height: 100%;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Agent Console (Terminal Style) */
+.agent-console {
+    flex: 1;
+    background-color: var(--console-bg);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.console-header {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.console-title {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.console-sub {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--accent-blue);
+}
+
+.console-body {
+    flex: 1;
+    padding: 1.25rem;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: #a5d6ff;
+}
+
+.log-line {
+    margin-bottom: 0.6rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.log-line.system {
+    color: var(--text-secondary);
+}
+
+.log-line.info {
+    color: #58a6ff;
+}
+
+.log-line.success {
+    color: #3fb950;
+}
+
+.log-line.warning {
+    color: #d29922;
+}
+
+/* Code Output Tab Styles */
+.code-output-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+}
+
+.code-header {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.code-header span {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.code-output-container pre {
+    flex: 1;
+    background-color: var(--code-bg);
+    padding: 1.25rem;
+    overflow: auto;
+    margin: 0;
+}
+
+.code-output-container code {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: #c9d1d9;
+    white-space: pre;
+}
+
+/* Performance Visualizer Styles */
+.performance-grid {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    overflow-y: auto;
+}
+
+.metric-summary-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1.5rem;
+}
+
+.metric-summary-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.speedup-display {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+#speedup-val {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #58a6ff;
+    line-height: 1;
+}
+
+.speedup-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.sub-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.sub-metric-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.sub-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.sub-val {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.chart-container {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1.25rem;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-container h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.chart-container canvas {
+    flex: 1;
+    max-height: 160px;
+}
+
+/* Footer Styles */
+.app-footer {
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 0.6rem 2rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}

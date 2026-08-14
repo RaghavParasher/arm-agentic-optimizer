@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arm-Agentic-Optimizer — AI Code Refactoring & Profiler for Arm64</title>
+    <!-- Fonts and Chart.js -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <div class="logo-icon">Arm</div>
+                <div class="logo-text">
+                    <h1>Agentic-Optimizer</h1>
+                    <p>Automated Profiler & Refactoring for Armv8/v9 CPUs</p>
+                </div>
+            </div>
+            <div class="header-status">
+                <span class="status-dot"></span>
+                <span class="status-text">Sim-Engine Active: ARMv9-A Neoverse</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Left Panel: Code Input & Examples -->
+            <section class="panel input-panel">
+                <div class="panel-header">
+                    <h2>Source Implementation</h2>
+                    <div class="file-selector">
+                        <select id="example-select">
+                            <option value="matmul">Matrix Multiplication (C++)</option>
+                            <option value="vecadd">Vector Addition (C++)</option>
+                            <option value="relu">ReLU Activation (C++)</option>
+                            <option value="python_loop">Naive Loops (Python)</option>
+                        </select>
+                        <button id="load-example-btn" class="btn-secondary">Load Template</button>
+                    </div>
+                </div>
+                
+                <div class="code-wrapper">
+                    <div class="editor-filename">
+                        <span class="file-icon">📄</span>
+                        <input type="text" id="filename-input" value="kernel.cpp">
+                    </div>
+                    <textarea id="code-input" spellcheck="false" placeholder="Paste your C++ or Python AI/math kernel code here..."></textarea>
+                </div>
+                
+                <div class="panel-actions">
+                    <button id="optimize-btn" class="btn-primary">
+                        <span class="btn-icon">⚡</span> Run Optimization Agent
+                    </button>
+                </div>
+            </section>
+
+            <!-- Right Panel: Outputs and Analysis -->
+            <section class="panel output-panel">
+                <div class="panel-header">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="tab-optimizer">Agent Logs</button>
+                        <button class="tab-btn" data-tab="tab-code">Optimized Code</button>
+                        <button class="tab-btn" data-tab="tab-performance">Performance Profile</button>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <!-- Tab: Agent Logs -->
+                    <div id="tab-optimizer" class="tab-content active">
+                        <div class="agent-console">
+                            <div class="console-header">
+                                <span class="console-title">Agent Execution Stream</span>
+                                <span id="agent-status" class="console-sub">Idle - Waiting for input...</span>
+                            </div>
+                            <div id="console-logs" class="console-body">
+                                <div class="log-line system">[System] Arm Agentic-Optimizer v1.0 initialized.</div>
+                                <div class="log-line system">[System] Ready to parse, refactor, and simulate code compilation targeting Arm64.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Optimized Code -->
+                    <div id="tab-code" class="tab-content">
+                        <div class="code-output-container">
+                            <div class="code-header">
+                                <span id="optimized-filename">kernel_optimized.cpp</span>
+                                <button id="copy-code-btn" class="btn-secondary">Copy Code</button>
+                            </div>
+                            <pre><code id="code-output">// Optimized code will appear here...</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Performance Profile -->
+                    <div id="tab-performance" class="tab-content">
+                        <div class="performance-grid">
+                            <div class="metric-summary-card">
+                                <h3>Efficiency Improvement</h3>
+                                <div class="speedup-display">
+                                    <span id="speedup-val">--</span>
+                                    <span class="speedup-label">Inference Speedup</span>
+                                </div>
+                                <div class="sub-metrics">
+                                    <div class="sub-metric-item">
+                                        <span class="sub-label">Cycles Saved</span>
+                                        <span id="cycles-saved-val" class="sub-val">--</span>
+                                    </div>
+                                    <div class="sub-metric-item">
+                                        <span class="sub-label">Energy Saved</span>
+                                        <span id="energy-saved-val" class="sub-val">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <h4>Execution Latency (ms) - Lower is Better</h4>
+                                <canvas id="latencyChart"></canvas>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <h4>L1/L2 Cache Misses (%) - Lower is Better</h4>
+                                <canvas id="cacheChart"></canvas>
+                            </div>
+                            
+                            <div class="chart-container">
+                                <h4>Power Draw (mW) - Lower is Better</h4>
+                                <canvas id="powerChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Arm Create 2026: AI Optimization Challenge Submission. Powered by Arm Dev Ecosystem.</p>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
