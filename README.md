@@ -6,6 +6,9 @@ By analyzing code patterns (such as loops and matrix operations), the optimizer 
 
 This project was built for **Track 2: Cloud AI** in the **Arm Create: AI Optimization Challenge 2026**.
 
+🚀 **Live Web App:** [https://arm-agentic-optimizer.vercel.app/](https://arm-agentic-optimizer.vercel.app/)  
+🔗 **GitHub Repository:** [https://github.com/RaghavParasher/arm-agentic-optimizer](https://github.com/RaghavParasher/arm-agentic-optimizer)
+
 ---
 
 ## 🚀 Key Features
@@ -99,6 +102,36 @@ To validate the optimizations:
 4. Monitor the live execution stream in the **Agent Logs** tab.
 5. Review the refactored implementation in the **Optimized Code** tab.
 6. Check the **Performance Profile** tab to view the latency, cycles, cache, and power metrics.
+
+---
+
+## 📜 Devpost Hackathon Story
+
+### 💡 Inspiration
+Deploying modern generative AI models and heavy mathematical loops onto Arm CPUs is highly energy-efficient but technically challenging. Developers often struggle to manually write vector assembly, configure caching boundaries, or identify where bottlenecks reside. We wanted to build a visual, intelligent developer environment that acts as an "optimization copilot"—analyzing code, refactoring it for Arm SIMD hardware, and immediately demonstrating the speedup and carbon savings.
+
+### 🧠 What it Does
+1. **AST-Based Scanner:** Scans C++ and Python source files to detect unoptimized mathematical loops, matrix operations, and activation functions.
+2. **Agentic Refactoring:** Automatically rewrites naive loops into vectorized equivalents using **Arm NEON SIMD** vector intrinsics and links to **Arm KleidiAI assembly microkernels**.
+3. **Interactive Compiler Preset Card:** Generates exact compiler flags (`-O3 -march=armv9-a -lkai`) tailored to targets like AWS Graviton, Google Axion, Snapdragon X Elite, and Raspberry Pi 5.
+4. **Sustainability Benchmarks:** Projects LATENCY, CACHE MISSES, POWER, INSTRUCTION count, and calculated **CARBON OFFSET** and **CLOUD HOSTING COST** savings.
+
+### 🛠️ How We Built It
+* **Core backend:** Node.js Express server executing token pattern mapping rules.
+* **Visual analytics:** Chart.js rendering comparative latency, cache, bandwidth, instructions, and power diagrams.
+* **Immersive frontend:** Modern dark theme styling with a custom scroll-synchronized line-number gutter, interactive particle emitter flow, and a 3D holographic wireframe register cube background rendered in pure HTML5 Canvas.
+
+### 🚧 Challenges We Ran Into
+* Developing a pure JS 3D perspective projection model without using heavy packages (to ensure Vercel's serverless cold starts remain instant).
+* Mapping approximate polynomial Taylor expansions for vectorized exponentials (`vexpq_f32`) inside Softmax loops.
+
+### 🎉 Accomplishments We're Proud Of
+* A zero-dependency, ultra-lightweight client-side 3D render loop running at 60 FPS.
+* High-fidelity, direct mapping to the newly released **Arm KleidiAI** spec.
+
+### 📚 What We Learned
+* Armv9 instruction pipeline capabilities, register configurations, and compilation targets.
+* The business value of Cloud AI code optimizations—where a minor cycle reduction cuts hosting costs by 60% and lowers global datacenter carbon footprints.
 
 ---
 
