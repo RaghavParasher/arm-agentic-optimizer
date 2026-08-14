@@ -675,19 +675,12 @@ select:hover {
     pointer-events: none;
 }
 
-/* 3D Card Tilt Effects */
+/* Card Hover Glow Highlight (Flat) */
 .tilt-card {
-    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
-    transform-style: preserve-3d;
-    will-change: transform;
+    transition: box-shadow 0.15s ease;
 }
 
 .tilt-card:hover {
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45), 0 0 1px 1px rgba(255, 255, 255, 0.15) !important;
-}
-
-/* Inner card elements depth */
-.tilt-card > * {
-    transform: translateZ(12px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
 }
 

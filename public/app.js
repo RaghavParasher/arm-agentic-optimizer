@@ -158,17 +158,25 @@ function clearCharts() {
 
 // Build standard double bar charts (Before vs After)
 function renderBarChart(ctxId, label, beforeVal, afterVal, beforeLabel, afterLabel, valueSuffix = '') {
-    const ctx = document.getElementById(ctxId).getContext('2d');
+    const canvasElement = document.getElementById(ctxId);
+    const ctx = canvasElement.getContext('2d');
+    
+    // Create gradient fills
+    const gradientBefore = ctx.createLinearGradient(0, 0, 0, canvasElement.offsetHeight || 150);
+    gradientBefore.addColorStop(0, 'rgba(218, 54, 51, 0.85)'); // Red
+    gradientBefore.addColorStop(1, 'rgba(218, 54, 51, 0.05)');
+    
+    const gradientAfter = ctx.createLinearGradient(0, 0, 0, canvasElement.offsetHeight || 150);
+    gradientAfter.addColorStop(0, 'rgba(27, 133, 243, 0.85)');  // Blue
+    gradientAfter.addColorStop(1, 'rgba(27, 133, 243, 0.05)');
+    
     const config = {
         type: 'bar',
         data: {
             labels: [beforeLabel, afterLabel],
             datasets: [{
                 data: [beforeVal, afterVal],
-                backgroundColor: [
-                    'rgba(218, 54, 51, 0.8)',  // Red for before
-                    'rgba(27, 133, 243, 0.8)'   // Blue for after
-                ],
+                backgroundColor: [gradientBefore, gradientAfter],
                 borderColor: [
                     '#da3633',
                     '#1b85f3'
@@ -180,6 +188,10 @@ function renderBarChart(ctxId, label, beforeVal, afterVal, beforeLabel, afterLab
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 1600,
+                easing: 'easeOutElastic' // Beautiful elastic spring bounce animation
+            },
             plugins: {
                 legend: { display: false }
             },
@@ -347,12 +359,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize 3D Visual Systems
     init3DBackground();
-    init3DTilt();
     initParticlesCanvas();
 });
 
 // ----------------------------------------------------
-// 3D CONSTELLATION BACKGROUND ENGINE (No external libs)
+// 3D HOLOGRAPHIC REGISTER CUBE BACKGROUND (No external libs)
 // ----------------------------------------------------
 function init3DBackground() {
     const canvas = document.getElementById('canvas-3d-bg');
@@ -367,31 +378,54 @@ function init3DBackground() {
         height = canvas.height = window.innerHeight;
     });
     
-    // Create 3D Coordinates (X, Y, Z)
-    const points = [];
-    const numPoints = 48;
-    for (let i = 0; i < numPoints; i++) {
-        points.push({
-            x: (Math.random() - 0.5) * 800,
-            y: (Math.random() - 0.5) * 800,
-            z: (Math.random() - 0.5) * 800,
-            vx: (Math.random() - 0.5) * 0.15,
-            vy: (Math.random() - 0.5) * 0.15,
-            vz: (Math.random() - 0.5) * 0.15
-        });
-    }
+    // Cube 3D vertices
+    const size = 160;
+    const vertices = [
+        {x: -size, y: -size, z: -size},
+        {x: size, y: -size, z: -size},
+        {x: size, y: size, z: -size},
+        {x: -size, y: size, z: -size},
+        {x: -size, y: -size, z: size},
+        {x: size, y: -size, z: size},
+        {x: size, y: size, z: size},
+        {x: -size, y: size, z: size}
+    ];
     
-    let angleX = 0.0006;
-    let angleY = 0.0008;
+    // 12 edges connecting the 8 vertices
+    const edges = [
+        [0, 1], [1, 2], [2, 3], [3, 0], // Back face
+        [4, 5], [5, 6], [6, 7], [7, 4], // Front face
+        [0, 4], [1, 5], [2, 6], [3, 7]  // Connectors
+    ];
+    
+    // Floating Holographic Register Opcode labels in 3D Space
+    const tags = [
+        {text: 'vld1q_f32', x: -220, y: -150, z: 120},
+        {text: 'vfmaq_f32', x: 220, y: 150, z: -120},
+        {text: 'vmaxq_f32', x: -200, y: 220, z: 200},
+        {text: 'vaddq_f32', x: 180, y: -180, z: -200},
+        {text: 'vexpq_f32', x: 0, y: -260, z: 100},
+        {text: 'vsubq_f32', x: -250, y: 0, z: -100},
+        {text: 'Q0-Q7 (NEON)', x: 120, y: 240, z: 150},
+        {text: 'X0-X30 (ARMv9)', x: -100, y: -240, z: -150},
+        {text: 'Arm KleidiAI', x: 260, y: -50, z: 120},
+        {text: 'SVE2 (256-bit)', x: -280, y: 100, z: -180},
+        {text: 'ASSEMBLY', x: 150, y: 60, z: 220},
+        {text: 'NEOVERSE', x: 0, y: 0, z: 0}
+    ];
+    
+    let angleX = 0.003;
+    let angleY = 0.004;
+    
+    // Mouse coords drift
     let mouseX = 0;
     let mouseY = 0;
-    
     window.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX - width / 2) * 0.0002;
-        mouseY = (e.clientY - height / 2) * 0.0002;
+        mouseX = (e.clientX - width / 2) * 0.0003;
+        mouseY = (e.clientY - height / 2) * 0.0003;
     });
     
-    const d = 420; // Perspective depth
+    const d = 450; // Perspective depth
     
     function animate() {
         ctx.clearRect(0, 0, width, height);
@@ -404,106 +438,89 @@ function init3DBackground() {
         const cosX = Math.cos(currentAngleX);
         const sinX = Math.sin(currentAngleX);
         
-        const projected = [];
-        
-        for (let i = 0; i < points.length; i++) {
-            const p = points[i];
+        // Rotate vertices
+        const rotatedVertices = vertices.map(v => {
+            let x1 = v.x * cosY - v.z * sinY;
+            let z1 = v.x * sinY + v.z * cosY;
+            let y2 = v.y * cosX - z1 * sinX;
+            let z2 = v.y * sinX + z1 * cosX;
             
-            p.x += p.vx;
-            p.y += p.vy;
-            p.z += p.vz;
-            
-            // Boundary limits
-            if (Math.abs(p.x) > 400) p.vx *= -1;
-            if (Math.abs(p.y) > 400) p.vy *= -1;
-            if (Math.abs(p.z) > 400) p.vz *= -1;
-            
-            // 3D Matrix Rotations
-            let x1 = p.x * cosY - p.z * sinY;
-            let z1 = p.x * sinY + p.z * cosY;
-            let y2 = p.y * cosX - z1 * sinX;
-            let z2 = p.y * sinX + z1 * cosX;
-            
-            const z_project = z2 + 650;
+            const z_project = z2 + 750;
             const screenX = (x1 * d) / z_project + width / 2;
             const screenY = (y2 * d) / z_project + height / 2;
             
-            projected.push({ x: screenX, y: screenY, z: z_project, rawZ: z2 });
-        }
+            return {x: screenX, y: screenY, z: z_project};
+        });
         
-        // Render network wires
-        for (let i = 0; i < projected.length; i++) {
-            for (let j = i + 1; j < projected.length; j++) {
-                const p1 = points[i];
-                const p2 = points[j];
-                const dx = p1.x - p2.x;
-                const dy = p1.y - p2.y;
-                const dz = p1.z - p2.z;
-                const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
-                
-                if (dist < 200) {
-                    const screen1 = projected[i];
-                    const screen2 = projected[j];
-                    const alpha = (1 - dist / 200) * 0.16;
-                    
-                    ctx.strokeStyle = `rgba(27, 133, 243, ${alpha})`;
-                    ctx.lineWidth = 0.8;
-                    ctx.beginPath();
-                    ctx.moveTo(screen1.x, screen1.y);
-                    ctx.lineTo(screen2.x, screen2.y);
-                    ctx.stroke();
-                }
-            }
-        }
-        
-        // Render glowing nodes
-        for (let i = 0; i < projected.length; i++) {
-            const screen = projected[i];
-            const r = Math.max(0.4, (1.8 * d) / screen.z);
-            const alpha = Math.min(1.0, Math.max(0.1, 1 - screen.z / 950)) * 0.4;
+        // Render 12 Cube Edges
+        ctx.strokeStyle = 'rgba(27, 133, 243, 0.12)';
+        ctx.lineWidth = 1.0;
+        edges.forEach(edge => {
+            const v1 = rotatedVertices[edge[0]];
+            const v2 = rotatedVertices[edge[1]];
             
-            ctx.fillStyle = `rgba(27, 133, 243, ${alpha})`;
+            const avgZ = (v1.z + v2.z) / 2;
+            const alpha = Math.min(0.25, Math.max(0.04, 1.2 - avgZ / 900));
+            ctx.strokeStyle = `rgba(27, 133, 243, ${alpha})`;
+            
             ctx.beginPath();
-            ctx.arc(screen.x, screen.y, r * 1.5, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.moveTo(v1.x, v1.y);
+            ctx.lineTo(v2.x, v2.y);
+            ctx.stroke();
+        });
+        
+        // Rotate and render Holographic register tags
+        tags.forEach(tag => {
+            let x1 = tag.x * cosY - tag.z * sinY;
+            let z1 = tag.x * sinY + tag.z * cosY;
+            let y2 = tag.y * cosX - z1 * sinX;
+            let z2 = tag.y * sinX + z1 * cosX;
             
-            if (screen.rawZ < -100) {
-                ctx.fillStyle = `rgba(165, 214, 255, ${alpha * 0.35})`;
-                ctx.beginPath();
-                ctx.arc(screen.x, screen.y, r * 3.5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
+            const z_project = z2 + 750;
+            const screenX = (x1 * d) / z_project + width / 2;
+            const screenY = (y2 * d) / z_project + height / 2;
+            
+            const scale = d / z_project;
+            const fontSize = Math.max(8, Math.min(14, 10 * scale));
+            const alpha = Math.min(0.45, Math.max(0.08, 1.1 - z_project / 1000));
+            
+            ctx.font = `${fontSize}px "JetBrains Mono", monospace`;
+            ctx.fillStyle = `rgba(165, 214, 255, ${alpha})`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(tag.text, screenX, screenY);
+            
+            // Connect to nearest vertex
+            let nearestIdx = 0;
+            let minDist = 99999;
+            vertices.forEach((v, idx) => {
+                const dx = tag.x - v.x;
+                const dy = tag.y - v.y;
+                const dz = tag.z - v.z;
+                const dist = dx*dx + dy*dy + dz*dz;
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestIdx = idx;
+                }
+            });
+            
+            const nearestV = rotatedVertices[nearestIdx];
+            ctx.strokeStyle = `rgba(27, 133, 243, ${alpha * 0.2})`;
+            ctx.lineWidth = 0.5;
+            ctx.setLineDash([2, 4]);
+            ctx.beginPath();
+            ctx.moveTo(screenX, screenY);
+            ctx.lineTo(nearestV.x, nearestV.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        });
+        
+        angleX += 0.0003;
+        angleY += 0.0004;
         
         requestAnimationFrame(animate);
     }
     animate();
-}
-
-// ----------------------------------------------------
-// TACTILE 3D CARD HOVER TILT INTERACTIVE ENGINE
-// ----------------------------------------------------
-function init3DTilt() {
-    const cards = document.querySelectorAll('.tilt-card');
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = ((centerY - y) / centerY) * 8; // Max 8 degree tilt
-            const rotateY = ((x - centerX) / centerX) * 8;
-            
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
-        });
-    });
 }
 
 // ----------------------------------------------------
