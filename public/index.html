@@ -96,6 +96,20 @@
                                 <span id="optimized-filename">kernel_optimized.cpp</span>
                                 <button id="copy-code-btn" class="btn-secondary">Copy Code</button>
                             </div>
+                            <div class="compiler-panel">
+                                <div class="compiler-header">
+                                    <span class="compiler-label">🛠️ Target Hardware Compilation Preset</span>
+                                    <select id="cpu-target-select">
+                                        <option value="neoverse-v2">AWS Graviton 3 (Neoverse V2)</option>
+                                        <option value="neoverse-n2">Google Axion (Neoverse N2)</option>
+                                        <option value="cortex-a76">Raspberry Pi 5 (Cortex-A76)</option>
+                                        <option value="cortex-x4">Snapdragon X Elite (Cortex-X4 / SVE2)</option>
+                                    </select>
+                                </div>
+                                <div class="compiler-body">
+                                    <code id="compiler-cmd">g++ -O3 -march=armv9-a -mcpu=neoverse-v2 -ffast-math -lkai kernel_optimized.cpp -o kernel_opt</code>
+                                </div>
+                            </div>
                             <pre><code id="code-output">// Optimized code will appear here...</code></pre>
                         </div>
                     </div>

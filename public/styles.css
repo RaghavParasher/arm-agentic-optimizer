@@ -592,6 +592,57 @@ select:hover {
     }
 }
 
+/* Compiler Presets Card Styles */
+.compiler-panel {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.85rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.compiler-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.compiler-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#cpu-target-select {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    outline: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+}
+
+.compiler-body {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.6rem 0.85rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+#compiler-cmd {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: #a5d6ff;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
 /* Footer Styles */
 .app-footer {
     background-color: var(--card-bg);

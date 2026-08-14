@@ -37,6 +37,33 @@ const optimizedFilename = document.getElementById('optimized-filename');
 const copyCodeBtn = document.getElementById('copy-code-btn');
 const tabButtons = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
+const cpuTargetSelect = document.getElementById('cpu-target-select');
+const compilerCmd = document.getElementById('compiler-cmd');
+
+const compilerPresets = {
+    'neoverse-v2': 'g++ -O3 -march=armv9-a -mcpu=neoverse-v2 -ffast-math -lkai {filename} -o {output}',
+    'neoverse-n2': 'g++ -O3 -march=armv9-a -mcpu=neoverse-n2 -ffast-math -lkai {filename} -o {output}',
+    'cortex-a76': 'g++ -O3 -march=armv8.2-a+fp16+dotprod -mcpu=cortex-a76 -ffast-math {filename} -o {output}',
+    'cortex-x4': 'g++ -O3 -march=armv9-a+sve2 -ffast-math -lkai {filename} -o {output}'
+};
+
+function updateCompilerCommand() {
+    if (!optimizedFilename || !compilerCmd || !cpuTargetSelect) return;
+    const target = cpuTargetSelect.value;
+    const filename = optimizedFilename.textContent;
+    const dotIdx = filename.lastIndexOf('.');
+    const outName = dotIdx !== -1 ? filename.substring(0, dotIdx) : 'kernel_opt';
+    
+    let template = compilerPresets[target] || compilerPresets['neoverse-v2'];
+    let command = template.replace('{filename}', filename).replace('{output}', outName);
+    
+    // If it is a python file, compile is not needed
+    if (filename.endsWith('.py')) {
+        command = `python -O ${filename}`;
+    }
+    
+    compilerCmd.textContent = command;
+}
 
 // Dynamically generate line numbers gutter
 function updateLineNumbers() {
@@ -58,6 +85,12 @@ function loadTemplate() {
         filenameInput.value = templates[selected].filename;
         codeInput.value = templates[selected].code;
         updateLineNumbers();
+        // Update temporary target filename for preview compilation command
+        const dotIdx = templates[selected].filename.lastIndexOf('.');
+        const nameWithoutExt = dotIdx !== -1 ? templates[selected].filename.substring(0, dotIdx) : templates[selected].filename;
+        const ext = dotIdx !== -1 ? templates[selected].filename.substring(dotIdx) : '';
+        optimizedFilename.textContent = `${nameWithoutExt}_optimized${ext}`;
+        updateCompilerCommand();
         logConsole(`System`, `Loaded template: ${templates[selected].filename}`);
     }
 }
@@ -239,6 +272,7 @@ function runOptimization() {
                 const ext = dotIdx !== -1 ? filename.substring(dotIdx) : '';
                 optimizedFilename.textContent = `${nameWithoutExt}_optimized${ext}`;
                 codeOutput.textContent = data.optimizedCode;
+                updateCompilerCommand();
                 
                 // Populate efficiency display
                 const perf = data.performance;
@@ -286,6 +320,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
+    cpuTargetSelect.addEventListener('change', updateCompilerCommand);
+    
     // Initialize line numbers count on load
     updateLineNumbers();
+    updateCompilerCommand();
 });
